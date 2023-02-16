@@ -4,29 +4,30 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from time import sleep
 from requests_html import HTMLSession
 import chromedriver_binary
 link = 'https://www.google.com/search?q=kings+bridge+auto&rlz=1C5GCEM_enCA1032CA1032&sxsrf=AJOqlzWrO_2TEnEQwAbmqIhLRgBTqz-Dmw%3A1676307742594&ei=Hm3qY73vI7CdptQPpMCYwAc&ved=0ahUKEwi99p_8_JL9AhWwjokEHSQgBngQ4dUDCA8&uact=5&oq=kings+bridge+auto&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQAzIECCMQJzIECCMQJzIQCC4QgAQQFBCHAhDHARCvATILCAAQFhAeEPEEEAoyCwgAEBYQHhDxBBAKMgsIABAWEB4Q8QQQCjIICAAQFhAeEAoyAggmMgUIABCGAzIFCAAQhgM6CggAEEcQ1gQQsANKBAhBGABKBAhGGABQqgdYqgdgsgloAnABeACAAYQBiAGEAZIBAzAuMZgBAKABAcgBBMABAQ&sclient=gws-wiz-serp#lrd=0x4b0ca3c1857b5645:0x7a7a0b75909dffd7,1,,,,'
-
-
-# chrome_driver_path = '/Users/Rikuo/Downloads/chromedriver_mac_arm64/chromedriver'
-
+max = 'https://www.google.com/search?q=max+auto+repairs&rlz=1C5GCEM_enCA1032CA1032&sxsrf=AJOqlzXEQpc-DPoqhQxk58HrP-hncDJ4Ag%3A1676570233806&ei=eW7uY_XRMISZptQPuYO3iAY&ved=0ahUKEwi18ufpzpr9AhWEjIkEHbnBDWEQ4dUDCA8&uact=5&oq=max+auto+repairs&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQAzIFCAAQgAQyCQgAEBYQHhDxBDIJCAAQFhAeEPEEMgYIABAWEB4yBggAEBYQHjIJCAAQFhAeEPEEMgkIABAWEB4Q8QQyCQgAEBYQHhDxBDIGCAAQFhAeMgYIABAWEB46BwgjELADECc6CggAEEcQ1gQQsAM6BAgjECc6CwguEMcBEK8BEJECOgUIABCRAjoLCC4QgAQQxwEQ0QM6CwgAEIAEELEDEIMBOg4ILhCABBCxAxDHARDRAzoFCC4QkQI6BAgAEEM6CggAELEDEIMBEEM6EAguEIAEEBQQhwIQxwEQrwE6CwguEIAEEMcBEK8BOgQILhBDOgcILhCxAxBDOhEILhCABBCxAxCDARDHARCvAToKCC4QsQMQgwEQQzoLCC4QrwEQxwEQgARKBAhBGABQmkhYwVhg9FloCXABeACAAagBiAGqD5IBBDAuMTaYAQCgAQHIAQPAAQE&sclient=gws-wiz-serp#lrd=0x4b0ca7c55c15d4b3:0x80aada1a73c25827,1,,,,'
 def get_review(node):
     return
 
-
 def launchChrome():
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
-    # driver.maximize_window()
     url = "https://www.google.com/maps/place/King's+Bridge+Service+Station/@47.577349,-52.7063888,17z/data=!4m8!3m7!1s0x4b0ca3c1857b5645:0x7a7a0b75909dffd7!8m2!3d47.577349!4d-52.7042001!9m1!1b1!16s%2Fg%2F1tf7x970"
     driver.get(link)
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-sort-id='newestFirst']")))
+    WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "div[data-sort-id='newestFirst']")))
+    driver.find_element(By.CSS_SELECTOR, "div[data-sort-id='newestFirst']").click()
+    # x = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-ved='2ahUKEwjO2PXk5Zr9AhWSVjUKHSlMAsYQmsgGKAF6BAgBEB0']")))
+    # print(x)
+    # driver.implicitly_wait(8)
     content = driver.page_source
     soup = BeautifulSoup(content, 'html.parser')
     nodes = soup.find_all("div", class_="gws-localreviews__google-review")
     review_list = []
-    # node = BeautifulSoup(str(nodes[0]), 'html.parser')
-    
     for node in nodes:
         node = BeautifulSoup(str(node), 'html.parser')
         img_node = node.find("img", class_='lDY1rd')
@@ -34,19 +35,43 @@ def launchChrome():
         user_name = img_node['alt']
         rating = node.find("span", class_=['Fam1ne', 'EBe2gf'])['aria-label']
         date = node.find('span', class_=['dehysf', 'lTi8oc']).text
-        content = str(node.find('div', class_='Jtu6Td'))
+        
+        content_dict = {
+            'review': '',
+            'services': ''
+        }
+        content = node.find('div', class_='Jtu6Td')
+        content_soup = BeautifulSoup(str(content), 'html.parser')
+        # services - if customer lists services they received
+        services = content_soup.find('div', class_='JRGY0')
+        # print (services)
+        # if review is long enough that it is clipped, get full review node
+        full_text = content_soup.find('span', class_='review-full-text')
+        if (full_text):
+            if (services):
+                content_dict['review'] = full_text.text.replace(services.text, '')
+                content_dict['services'] = services.text
+                # print(content_dict['review'])
+            else:
+                content_dict['review'] = full_text.text
+        # else if services are in review text
+        elif (services):
+            content_dict['review'] = content_soup.text.replace(services.text, '')
+            content_dict['services'] = services.text
+        # else get review content as normal
+        else: 
+            content_dict['review'] = content_soup.find('div', class_='Jtu6Td').text
+        # services
+
         review_dict = {
             'avatar': avatar,
             'name': user_name,
             'rating': rating,
             'date': date,
-            'content': content
+            'content': content_dict
         }
-        review_list.append(review_dict)
-
-        print(content)
-    
-    # print(review_list)
+        review_list.append(review_dict)    
+    print(review_list)
     return review_list
 
     # get avatar and name from img alt text
@@ -68,10 +93,10 @@ def launchChrome():
     # print(nodes[0])
     # for node in nodes:
     #     print(node)
-    # while(True):
-    #     pass
+    while(True):
+        pass
 
-launchChrome()
+print(launchChrome())
 # session = HTMLSession()
 # sleep(3)
 # response = session.get('https://www.google.com/search?q=kings+bridge+auto&rlz=1C5GCEM_enCA1032CA1032&sxsrf=AJOqlzWrO_2TEnEQwAbmqIhLRgBTqz-Dmw%3A1676307742594&ei=Hm3qY73vI7CdptQPpMCYwAc&ved=0ahUKEwi99p_8_JL9AhWwjokEHSQgBngQ4dUDCA8&uact=5&oq=kings+bridge+auto&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQAzIECCMQJzIECCMQJzIQCC4QgAQQFBCHAhDHARCvATILCAAQFhAeEPEEEAoyCwgAEBYQHhDxBBAKMgsIABAWEB4Q8QQQCjIICAAQFhAeEAoyAggmMgUIABCGAzIFCAAQhgM6CggAEEcQ1gQQsANKBAhBGABKBAhGGABQqgdYqgdgsgloAnABeACAAYQBiAGEAZIBAzAuMZgBAKABAcgBBMABAQ&sclient=gws-wiz-serp#lrd=0x4b0ca3c1857b5645:0x7a7a0b75909dffd7,1,,,,')

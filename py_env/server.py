@@ -11,6 +11,5 @@ def get_reviews():
     response.headers.set('Access-Control-Allow-Origin', '*')
     return response
 
-
 if __name__ == '__main__':
     app.run('0.0.0.0', 8000)
