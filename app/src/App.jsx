@@ -30,6 +30,7 @@ function App() {
       setReviews(data)
     })
   }, [shop])
+
   return (
     <>
     <ButtonGroup
@@ -39,6 +40,7 @@ function App() {
       <Select onClick={()=>{setShop('/kings_bridge_auto')}}>Kings Bridge Auto</Select>
       <Select onClick={()=>{setShop('/max_auto_repair')}}>Max Auto Repair</Select>
     </ButtonGroup>
+    <Box id='lol'>yeah</Box>
     <Heading>{shop.replace(/[^a-zA-Z]+/g, ' ').toUpperCase()}</Heading>
     <Flex
     height='100vh'

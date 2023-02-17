@@ -1,5 +1,5 @@
 import { Box, Text } from "@chakra-ui/react"
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { AiFillStar, AiOutlineStar } from 'react-icons/ai'
 export const Review = ({name, avatar, rating, date, content}) => {
     const {review, services} = content
@@ -12,8 +12,12 @@ export const Review = ({name, avatar, rating, date, content}) => {
             stars.push(<AiOutlineStar/>)
         }
     }
+    const testHTML = 'HELLO<br>HELLO<br>WHAT'
+    document.getElementById('lol').innerHTML = testHTML
+    const ref = useRef(null)
+    console.log(ref.current.innerHTML)
     return (
-        <Box>
+        <Box ref={ref}>
             <img
             src={avatar} alt={name}/>
             <Box>
