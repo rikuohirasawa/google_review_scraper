@@ -9,21 +9,29 @@ from selenium.webdriver.support import expected_conditions as EC
 from time import sleep
 from requests_html import HTMLSession
 import chromedriver_binary
+import firebase_admin
+from firebase_admin import credentials, db
+import os
+from dotenv import load_dotenv
+
 link = 'https://www.google.com/search?q=kings+bridge+auto&rlz=1C5GCEM_enCA1032CA1032&sxsrf=AJOqlzWrO_2TEnEQwAbmqIhLRgBTqz-Dmw%3A1676307742594&ei=Hm3qY73vI7CdptQPpMCYwAc&ved=0ahUKEwi99p_8_JL9AhWwjokEHSQgBngQ4dUDCA8&uact=5&oq=kings+bridge+auto&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQAzIECCMQJzIECCMQJzIQCC4QgAQQFBCHAhDHARCvATILCAAQFhAeEPEEEAoyCwgAEBYQHhDxBBAKMgsIABAWEB4Q8QQQCjIICAAQFhAeEAoyAggmMgUIABCGAzIFCAAQhgM6CggAEEcQ1gQQsANKBAhBGABKBAhGGABQqgdYqgdgsgloAnABeACAAYQBiAGEAZIBAzAuMZgBAKABAcgBBMABAQ&sclient=gws-wiz-serp#lrd=0x4b0ca3c1857b5645:0x7a7a0b75909dffd7,1,,,,'
 max = 'https://www.google.com/search?q=max+auto+repairs&rlz=1C5GCEM_enCA1032CA1032&sxsrf=AJOqlzXEQpc-DPoqhQxk58HrP-hncDJ4Ag%3A1676570233806&ei=eW7uY_XRMISZptQPuYO3iAY&ved=0ahUKEwi18ufpzpr9AhWEjIkEHbnBDWEQ4dUDCA8&uact=5&oq=max+auto+repairs&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQAzIFCAAQgAQyCQgAEBYQHhDxBDIJCAAQFhAeEPEEMgYIABAWEB4yBggAEBYQHjIJCAAQFhAeEPEEMgkIABAWEB4Q8QQyCQgAEBYQHhDxBDIGCAAQFhAeMgYIABAWEB46BwgjELADECc6CggAEEcQ1gQQsAM6BAgjECc6CwguEMcBEK8BEJECOgUIABCRAjoLCC4QgAQQxwEQ0QM6CwgAEIAEELEDEIMBOg4ILhCABBCxAxDHARDRAzoFCC4QkQI6BAgAEEM6CggAELEDEIMBEEM6EAguEIAEEBQQhwIQxwEQrwE6CwguEIAEEMcBEK8BOgQILhBDOgcILhCxAxBDOhEILhCABBCxAxCDARDHARCvAToKCC4QsQMQgwEQQzoLCC4QrwEQxwEQgARKBAhBGABQmkhYwVhg9FloCXABeACAAagBiAGqD5IBBDAuMTaYAQCgAQHIAQPAAQE&sclient=gws-wiz-serp#lrd=0x4b0ca7c55c15d4b3:0x80aada1a73c25827,1,,,,'
-def get_review(node):
-    return
+
+cred = credentials.Certificate('./mm-scraper-db-1f403-firebase-adminsdk-rig3k-1c4883980a.json')
+default_app = firebase_admin.initialize_app(cred, {
+    'databaseURL': 'https://mm-scraper-db-1f403-default-rtdb.firebaseio.com'
+})
+ref = db.reference('/max_auto_repair')
 
 def launchChrome():
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
     url = "https://www.google.com/maps/place/King's+Bridge+Service+Station/@47.577349,-52.7063888,17z/data=!4m8!3m7!1s0x4b0ca3c1857b5645:0x7a7a0b75909dffd7!8m2!3d47.577349!4d-52.7042001!9m1!1b1!16s%2Fg%2F1tf7x970"
-    driver.get(link)
+    driver.get(max)
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-sort-id='newestFirst']")))
     WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "div[data-sort-id='newestFirst']")))
     driver.find_element(By.CSS_SELECTOR, "div[data-sort-id='newestFirst']").click()
-    # x = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-ved='2ahUKEwjO2PXk5Zr9AhWSVjUKHSlMAsYQmsgGKAF6BAgBEB0']")))
-    # print(x)
-    # driver.implicitly_wait(8)
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-ved='2ahUKEwjO2PXk5Zr9AhWSVjUKHSlMAsYQmsgGKAF6BAgBEB0']")))
+
     content = driver.page_source
     soup = BeautifulSoup(content, 'html.parser')
     nodes = soup.find_all("div", class_="gws-localreviews__google-review")
@@ -62,7 +70,6 @@ def launchChrome():
         else: 
             content_dict['review'] = content_soup.find('div', class_='Jtu6Td').text
         # services
-
         review_dict = {
             'avatar': avatar,
             'name': user_name,
@@ -71,8 +78,26 @@ def launchChrome():
             'content': content_dict
         }
         review_list.append(review_dict)    
-    print(review_list)
+    # print(review_list)
+    # ref.set(review_list)
+    while(True):
+        pass
     return review_list
+
+# print(launchChrome())
+
+def db_set(ref):
+    db.reference(ref).set(launchChrome())
+
+# db_set()
+
+def db_get(ref):
+    print(db.reference(ref).get())
+    return db.reference(ref).get()
+
+# print(db_get())
+
+
 
     # get avatar and name from img alt text
 
@@ -93,10 +118,10 @@ def launchChrome():
     # print(nodes[0])
     # for node in nodes:
     #     print(node)
-    while(True):
-        pass
+    # while(True):
+    #     pass
 
-print(launchChrome())
+# print(launchChrome())
 # session = HTMLSession()
 # sleep(3)
 # response = session.get('https://www.google.com/search?q=kings+bridge+auto&rlz=1C5GCEM_enCA1032CA1032&sxsrf=AJOqlzWrO_2TEnEQwAbmqIhLRgBTqz-Dmw%3A1676307742594&ei=Hm3qY73vI7CdptQPpMCYwAc&ved=0ahUKEwi99p_8_JL9AhWwjokEHSQgBngQ4dUDCA8&uact=5&oq=kings+bridge+auto&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQAzIECCMQJzIECCMQJzIQCC4QgAQQFBCHAhDHARCvATILCAAQFhAeEPEEEAoyCwgAEBYQHhDxBBAKMgsIABAWEB4Q8QQQCjIICAAQFhAeEAoyAggmMgUIABCGAzIFCAAQhgM6CggAEEcQ1gQQsANKBAhBGABKBAhGGABQqgdYqgdgsgloAnABeACAAYQBiAGEAZIBAzAuMZgBAKABAcgBBMABAQ&sclient=gws-wiz-serp#lrd=0x4b0ca3c1857b5645:0x7a7a0b75909dffd7,1,,,,')

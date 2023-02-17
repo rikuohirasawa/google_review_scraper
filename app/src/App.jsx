@@ -12,7 +12,7 @@ const Container = (props) => {
 function App() {
   const [reviews, setReviews] = useState(null)
   useEffect(()=>{
-    fetch('http://127.0.0.1:8000/api/get-reviews')
+    fetch(`http://127.0.0.1:8000/api/garage-reviews?ref=${'/kings_bridge_auto'}`)
     .then(res=>res.json()
     ).then(data=>{
       console.log(data)
