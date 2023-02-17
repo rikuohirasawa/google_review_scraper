@@ -1,4 +1,5 @@
 import { Box, Text } from "@chakra-ui/react"
+import { useState } from "react"
 import { AiFillStar, AiOutlineStar } from 'react-icons/ai'
 export const Review = ({name, avatar, rating, date, content}) => {
     const {review, services} = content
@@ -13,7 +14,8 @@ export const Review = ({name, avatar, rating, date, content}) => {
     }
     return (
         <Box>
-            <img src={avatar} alt={name}/>
+            <img
+            src={avatar} alt={name}/>
             <Box>
                 <Text>{name}</Text>
                 <Box>
