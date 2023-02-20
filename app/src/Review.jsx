@@ -1,6 +1,7 @@
 import { Box, Text } from "@chakra-ui/react"
 import { useState, useRef } from "react"
 import { AiFillStar, AiOutlineStar } from 'react-icons/ai'
+import DomPurify from 'dompurify'
 export const Review = ({name, avatar, rating, date, content, full_node, full_review}) => {
     const {review, services} = content
     const numRating = Number(rating.split(' ')[1])
@@ -12,18 +13,17 @@ export const Review = ({name, avatar, rating, date, content, full_node, full_rev
             stars.push(<AiOutlineStar/>)
         }
     }
+    const sanitizedNode = DomPurify.sanitize(full_node)
+    // console.log(sanitizedNode)
+    
     const ref = useRef(null)
-    // console.log(ref.current.innerHTML)
-    // console.log(full_node)
-    // ref.current.innerHTML = full_node
     if (full_review !== 'None') {
         // console.log(full_review.replace('style="display:"'))
         document.getElementById('test').innerHTML = full_review.replace('style="display:none"', '')
     }
-    // full_review.replace('style="display:none"', '')
-    // console.log(full_node)
     return (
         <Box>
+            {/* <Box dangerouslySetInnerHTML={{__html: sanitizedNode.replace('style="display:none"', '')}}></Box> */}
             <img
             src={avatar} alt={name}/>
             <Box>

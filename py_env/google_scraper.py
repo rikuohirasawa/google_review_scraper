@@ -28,14 +28,11 @@ default_app = firebase_admin.initialize_app(cred, {
 
 def launchChrome():
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
-    url = "https://www.google.com/maps/place/King's+Bridge+Service+Station/@47.577349,-52.7063888,17z/data=!4m8!3m7!1s0x4b0ca3c1857b5645:0x7a7a0b75909dffd7!8m2!3d47.577349!4d-52.7042001!9m1!1b1!16s%2Fg%2F1tf7x970"
     driver.get(link)
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-sort-id='newestFirst']")))
     WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "div[data-sort-id='newestFirst']")))
     driver.find_element(By.CSS_SELECTOR, "div[data-sort-id='newestFirst']").click()
     sleep(2)
-    newest_btn = driver.find_element(By.CSS_SELECTOR, "div[data-sort-id='newestFirst']")
-    is_sorted_by_newest = newest_btn.get_attribute('aria-checked')
     num_reviews = int(driver.find_element(By.CSS_SELECTOR, "span[class='z5jxId']").text.split()[0])
     num_scroll_to_bottom = math.ceil(num_reviews/10)
     for i in range(0, num_scroll_to_bottom):
@@ -43,16 +40,18 @@ def launchChrome():
         sleep(2)
     sleep(3)
     
-    scroll_modal = driver.find_element(By.CSS_SELECTOR, "div[class='review-dialog-list']")
-    # print('yo', scroll_modal.scroll)
-    # WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@data-sort-id='newestFirst' and aria-checked='true']")))
-
     content = driver.page_source
     soup = BeautifulSoup(content, 'html.parser')
     nodes = soup.find_all("div", class_="gws-localreviews__google-review")
     review_list = []
     for node in nodes:
         node = BeautifulSoup(str(node), 'html.parser')
+        # trim down the nodes, removing unecessary nodes
+        # node.find("g-dropdown-menu").decompose()
+        # removals = node.find_all("g-snackbar")
+        # for rm in removals:
+        #     rm.decompose()
+        # node.find("span", class_="review-snippet").decompose()
         img_node = node.find("img", class_='lDY1rd')
         avatar = img_node['src']
         user_name = img_node['alt']
@@ -67,7 +66,23 @@ def launchChrome():
         content_soup = BeautifulSoup(str(content), 'html.parser')
         # services - if customer lists services they received
         services = content_soup.find('div', class_='JRGY0')
-        # print (services)
+
+        # response_soup = BeautifulSoup(str(node.find('div', class_='LfKETd')))
+        print(node)
+        reply_list = []
+        # owner responses
+        reply_node = node.find('div', class_='LfKETd')
+        print(reply_node)
+        if (reply_node):
+            reply = {
+                'date': '',
+                'content': ''
+            }
+            reply['date'] = node.find('span', class_='pi8uOe').text
+            reply['content'] = str(node.find('span', class_='d6SCIc'))
+            print('reply', reply)
+            reply_list.append(reply)
+
         # if review is long enough that it is clipped, get full review node
         full_text = content_soup.find('span', class_='review-full-text')
         if (full_text):
@@ -92,7 +107,8 @@ def launchChrome():
             'date': date,
             'content': content_dict,
             'full_review': str(full_text),
-            'full_node': str(node)
+            'full_node': str(node),
+            'replies': reply_list
         }
         review_list.append(review_dict)    
     print(len(review_list))
@@ -101,8 +117,7 @@ def launchChrome():
     #     pass
     return review_list
 
-
-# print(launchChrome())
+# launchChrome()
 
 
 
@@ -121,53 +136,13 @@ def db_get(ref):
 # print(db_get())
 
 
+# def sample():
+#     data = db.reference('kings_bridge_auto').get()
+#     print(data)
+#     soup = BeautifulSoup(data, 'html.parser')
+#     soup.find()
 
-    # get avatar and name from img alt text
-
-    # get review 
-    # review = node.find('div', class_='Jtu6Td')
-    # if (node.find('span', class_='review-full-text')):
-    #     review = node.find('span', class_='review-full-text')
-    # else:
-    #     review = 
-    # print(len(nodes))
-    # for node in nodes:
-    #     print(node.find())
-    #     print(BeautifulSoup(node, 'html.parser').prettify())
-    # for node in nodes:
-    #     re_soup = BeautifulSoup(node, 'html.parser')
-    #     avatar = re_soup.find("img", class_="lDY1rd")['src']
-    #     print(avatar)
-    # print(nodes[0])
-    # for node in nodes:
-    #     print(node)
-    # while(True):
-    #     pass
-
-# print(launchChrome())
-# session = HTMLSession()
-# sleep(3)
-# response = session.get('https://www.google.com/search?q=kings+bridge+auto&rlz=1C5GCEM_enCA1032CA1032&sxsrf=AJOqlzWrO_2TEnEQwAbmqIhLRgBTqz-Dmw%3A1676307742594&ei=Hm3qY73vI7CdptQPpMCYwAc&ved=0ahUKEwi99p_8_JL9AhWwjokEHSQgBngQ4dUDCA8&uact=5&oq=kings+bridge+auto&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQAzIECCMQJzIECCMQJzIQCC4QgAQQFBCHAhDHARCvATILCAAQFhAeEPEEEAoyCwgAEBYQHhDxBBAKMgsIABAWEB4Q8QQQCjIICAAQFhAeEAoyAggmMgUIABCGAzIFCAAQhgM6CggAEEcQ1gQQsANKBAhBGABKBAhGGABQqgdYqgdgsgloAnABeACAAYQBiAGEAZIBAzAuMZgBAKABAcgBBMABAQ&sclient=gws-wiz-serp#lrd=0x4b0ca3c1857b5645:0x7a7a0b75909dffd7,1,,,,')
-# response.html.render()
-# print(response.text)
-# soup = BeautifulSoup(response.text, 'html.parser')
-# print(soup.prettify())
-
-# response = requests.get(link, timeout=(5, 4))
-# print(response)
-# soup = BeautifulSoup(response.text, 'html.parser')
-# # print(soup.prettify())
-# title = soup.find('title')
-# print(title.text)
-# nodes = soup.find('a', attrs={'data-async-trigger': 'reviewDialog'})
-# print(nodes)
-# children = nodes.findChild('span')
-# print(children.text)
-
-
-# for node in nodes:
-#     print(node.text)
-
+# sample()
 
 
 
