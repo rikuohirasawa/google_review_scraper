@@ -40,7 +40,7 @@ function App() {
       <Select onClick={()=>{setShop('/kings_bridge_auto')}}>Kings Bridge Auto</Select>
       <Select onClick={()=>{setShop('/max_auto_repair')}}>Max Auto Repair</Select>
     </ButtonGroup>
-    <Box id='lol'>yeah</Box>
+    <Box id='test'>yeah</Box>
     <Heading>{shop.replace(/[^a-zA-Z]+/g, ' ').toUpperCase()}</Heading>
     <Flex
     height='100vh'
@@ -60,7 +60,7 @@ function App() {
         flexDir='column'>
           {reviews && (
             reviews.map(e=>{
-              return <Review name={e.name} avatar={e.avatar} rating={e.rating} date={e.date} content={e.content}/>
+              return <Review name={e.name} avatar={e.avatar} rating={e.rating} date={e.date} content={e.content} full_node={e.full_node} full_review={e.full_review}/>
             })
           )}
         </Flex>
