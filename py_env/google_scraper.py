@@ -17,13 +17,12 @@ import math
 import json
 
 
-
 link = 'https://www.google.com/search?q=kings+bridge+auto&rlz=1C5GCEM_enCA1032CA1032&sxsrf=AJOqlzWrO_2TEnEQwAbmqIhLRgBTqz-Dmw%3A1676307742594&ei=Hm3qY73vI7CdptQPpMCYwAc&ved=0ahUKEwi99p_8_JL9AhWwjokEHSQgBngQ4dUDCA8&uact=5&oq=kings+bridge+auto&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQAzIECCMQJzIECCMQJzIQCC4QgAQQFBCHAhDHARCvATILCAAQFhAeEPEEEAoyCwgAEBYQHhDxBBAKMgsIABAWEB4Q8QQQCjIICAAQFhAeEAoyAggmMgUIABCGAzIFCAAQhgM6CggAEEcQ1gQQsANKBAhBGABKBAhGGABQqgdYqgdgsgloAnABeACAAYQBiAGEAZIBAzAuMZgBAKABAcgBBMABAQ&sclient=gws-wiz-serp#lrd=0x4b0ca3c1857b5645:0x7a7a0b75909dffd7,1,,,,'
 max = 'https://www.google.com/search?q=max+auto+repairs&rlz=1C5GCEM_enCA1032CA1032&sxsrf=AJOqlzXEQpc-DPoqhQxk58HrP-hncDJ4Ag%3A1676570233806&ei=eW7uY_XRMISZptQPuYO3iAY&ved=0ahUKEwi18ufpzpr9AhWEjIkEHbnBDWEQ4dUDCA8&uact=5&oq=max+auto+repairs&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQAzIFCAAQgAQyCQgAEBYQHhDxBDIJCAAQFhAeEPEEMgYIABAWEB4yBggAEBYQHjIJCAAQFhAeEPEEMgkIABAWEB4Q8QQyCQgAEBYQHhDxBDIGCAAQFhAeMgYIABAWEB46BwgjELADECc6CggAEEcQ1gQQsAM6BAgjECc6CwguEMcBEK8BEJECOgUIABCRAjoLCC4QgAQQxwEQ0QM6CwgAEIAEELEDEIMBOg4ILhCABBCxAxDHARDRAzoFCC4QkQI6BAgAEEM6CggAELEDEIMBEEM6EAguEIAEEBQQhwIQxwEQrwE6CwguEIAEEMcBEK8BOgQILhBDOgcILhCxAxBDOhEILhCABBCxAxCDARDHARCvAToKCC4QsQMQgwEQQzoLCC4QrwEQxwEQgARKBAhBGABQmkhYwVhg9FloCXABeACAAagBiAGqD5IBBDAuMTaYAQCgAQHIAQPAAQE&sclient=gws-wiz-serp#lrd=0x4b0ca7c55c15d4b3:0x80aada1a73c25827,1,,,,'
 
 cred = credentials.Certificate('firebase_credentials.json')
 default_app = firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://mm-scraper-db-1f403-default-rtdb.firebaseio.com'
+    'databaseURL': 'https://mm-scraper-db-1f403-default-rtdb.firebaseio.com/'
 })
 
 def launchChrome():
@@ -68,20 +67,24 @@ def launchChrome():
         services = content_soup.find('div', class_='JRGY0')
 
         # response_soup = BeautifulSoup(str(node.find('div', class_='LfKETd')))
-        print(node)
         reply_list = []
         # owner responses
         reply_node = node.find('div', class_='LfKETd')
-        print(reply_node)
         if (reply_node):
             reply = {
                 'date': '',
                 'content': ''
             }
-            reply['date'] = node.find('span', class_='pi8uOe').text
-            reply['content'] = str(node.find('span', class_='d6SCIc'))
-            print('reply', reply)
+            reply_date_node = node.find('span', class_='pi8uOe')
+            reply_content_node = node.find('div', class_='d6SCIc')
+            if reply_content_node and reply_date_node:
+                reply['content'] = reply_content_node.text
+                reply['date'] = reply_date_node.text
+            # node.find('div', class_='d6SCIc').text
+                print('reply', reply)
             reply_list.append(reply)
+        
+        print(reply_list)
 
         # if review is long enough that it is clipped, get full review node
         full_text = content_soup.find('span', class_='review-full-text')
@@ -107,8 +110,7 @@ def launchChrome():
             'date': date,
             'content': content_dict,
             'full_review': str(full_text),
-            'full_node': str(node),
-            'replies': reply_list
+            'replies': json.dumps(reply_list)
         }
         review_list.append(review_dict)    
     print(len(review_list))
@@ -133,7 +135,7 @@ def db_get(ref):
     print(db.reference(ref).get())
     return db.reference(ref).get()
 
-# print(db_get())
+# print(db_get('/kings_bridge_auto'))
 
 
 # def sample():

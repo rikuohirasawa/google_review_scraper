@@ -1,0 +1,17 @@
+html,
+body {
+    margin: 0;
+    box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: inherit;
+    }
+
+::-webkit-scrollbar-thumb {
+    background: #E0ECF1
+    }

@@ -21,6 +21,10 @@ const FlexCol = (props) => {
     return <Flex 
     flexDir='column'
     align='flex-start'
+    padding='0.5rem'
+    width='100%'
+    lineHeight='1.8'
+    borderBottom='1px solid #E0ECF1'
     {...props}/>
 }
 export const Sidebar = () => {
@@ -30,9 +34,10 @@ export const Sidebar = () => {
         align='flex-start'
         gap='8px'
         background='#fff'
-        padding='16px'
+        padding='1rem 2rem'
         borderRadius='16px'
-        height='65vh'>
+        height='65vh'
+        width='40%'>
             <HeadingSmall>Garage</HeadingSmall>
                 <FlexCol>
                     <NavText>Garage Overview</NavText>
