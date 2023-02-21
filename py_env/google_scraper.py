@@ -75,16 +75,23 @@ def launchChrome():
                 'date': '',
                 'content': ''
             }
+
+            if (BeautifulSoup(str(reply_node), 'html.parser').find('div', class_='lororc')):
+                reply_soup = BeautifulSoup(str(reply_node), 'html.parser').find('div', class_='lororc')
+                reply_content_node = reply_soup.find('span', class_='d6SCIc')
+                print('hello', str(reply_content_node))
+                reply['content'] = str(reply_content_node)
+            else:
+                reply_content_node = node.find('div', class_='d6SCIc')
+                if reply_content_node:
+                    reply['content'] = reply_content_node.text
             reply_date_node = node.find('span', class_='pi8uOe')
-            reply_content_node = node.find('div', class_='d6SCIc')
-            if reply_content_node and reply_date_node:
-                reply['content'] = reply_content_node.text
-                reply['date'] = reply_date_node.text
+            reply['date'] = reply_date_node.text
             # node.find('div', class_='d6SCIc').text
-                print('reply', reply)
+            print('reply', reply)
             reply_list.append(reply)
         
-        print(reply_list)
+        # print(reply_list)
 
         # if review is long enough that it is clipped, get full review node
         full_text = content_soup.find('span', class_='review-full-text')
