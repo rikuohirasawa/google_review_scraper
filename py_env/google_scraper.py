@@ -26,7 +26,12 @@ default_app = firebase_admin.initialize_app(cred, {
 })
 
 def launchChrome():
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+    options = webdriver.ChromeOptions()
+    options.add_argument('--no-sandbox')
+    options.add_argument('--headless')
+
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    wait = WebDriverWait(driver, 5)
     driver.get(link)
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-sort-id='newestFirst']")))
     WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "div[data-sort-id='newestFirst']")))
@@ -126,7 +131,7 @@ def launchChrome():
     #     pass
     return review_list
 
-# launchChrome()
+launchChrome()
 
 
 
@@ -136,7 +141,7 @@ def launchChrome():
 def db_set(ref):
     db.reference(ref).set(launchChrome())
 
-db_set('/kings_bridge_auto')
+# db_set('/kings_bridge_auto')
 
 def db_get(ref):
     print(db.reference(ref).get())
