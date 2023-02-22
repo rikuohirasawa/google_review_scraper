@@ -29,10 +29,14 @@ def launchChrome():
     options = webdriver.ChromeOptions()
     options.add_argument('--no-sandbox')
     options.add_argument('--headless')
+    options.add_argument("--window-size=1920,1080")
 
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     wait = WebDriverWait(driver, 5)
+
+    print('link', driver.get(link))
     driver.get(link)
+    # print(BeautifulSoup(driver.page_source, 'html.parser').prettify())
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-sort-id='newestFirst']")))
     WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "div[data-sort-id='newestFirst']")))
     driver.find_element(By.CSS_SELECTOR, "div[data-sort-id='newestFirst']").click()
@@ -127,9 +131,9 @@ def launchChrome():
         review_list.append(review_dict)    
     print(len(review_list))
     # ref.set(review_list)
-    # while(True):
-    #     pass
-    return review_list
+    while(True):
+        pass
+    # return review_list
 
 launchChrome()
 
