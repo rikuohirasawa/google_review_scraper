@@ -26,6 +26,7 @@ def launchChrome():
     driver = webdriver.Chrome(service=Service("/home/ubuntu/chromedriver"), options=chrome_options)
     driver.get('https://www.google.com/search?q=King%27s+Bridge+Service+Station%2C+Kings+Bridge+Road%2C+St.+John%27s%2C+Newfoundland+and+Labrador&rlz=1C5GCEM_enCA1032CA1032&sxsrf=AJOqlzWEZtCvuBvQYFsUhYAy_WMWmvIU9g%3A1677160312137&ei=eG_3Y-WCCM6nptQP8KKUyA0&oq=kings+bridge+auto+st+johns+newfoun&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQARgAMgIIJjoHCCMQsAMQJzoKCAAQRxDWBBCwAzoECCMQJzoJCAAQFhAeEPEEOgsIABAWEB4Q8QQQCjoICAAQFhAeEAo6BQgAEIYDOgcIABANEIAEOgYIABAeEA06CwgAEAgQHhANEPEESgQIQRgAULcJWN0eYIYsaAFwAXgAgAGAAYgBmg2SAQQxMy40mAEAoAEByAEEwAEB&sclient=gws-wiz-serp#lrd=0x4b0ca3c1857b5645:0x7a7a0b75909dffd7,1,,,,')
     driver.set_window_size(1920, 1080)
+    sleep(5)
     driver.save_screenshot('screenshot.png')
     driver.implicitly_wait(10)
     try:
