@@ -6,19 +6,19 @@ import { Review } from './Review'
 
 import { Box, Flex, Heading, Button, ButtonGroup } from '@chakra-ui/react'
 
-const Container = (props) => {
-  return <Box {...props}/>
-}
+// const Container = (props) => {
+//   return <Box {...props}/>
+// }
 
-const Select = (props) => {
-  return <Button 
-  padding='16px'
-  fontSize='20px'
-  _hover={{
-    background: '#fb5012'
-  }}
-  {...props}/>
-}
+// const Select = (props) => {
+//   return <Button 
+//   padding='16px'
+//   fontSize='20px'
+//   _hover={{
+//     background: '#fb5012'
+//   }}
+//   {...props}/>
+// }
 
 function App() {
   const [reviews, setReviews] = useState(null);

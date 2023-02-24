@@ -88,6 +88,8 @@ def launchChrome(url, db_ref):
         content_soup = BeautifulSoup(str(content), 'html.parser')
         # services - if customer lists services they received
         services = content_soup.find('div', class_='JRGY0')
+        if (services == None):
+            services = content_soup.find('div', class_='eX1cmf')
 
         # response_soup = BeautifulSoup(str(node.find('div', class_='LfKETd')))
         reply_list = []

@@ -72,7 +72,7 @@ export const Review = ({name, avatar, rating, date, content, full_node, full_rev
                         <Box>
                             {repliesArray.map(e=>{
                                 return (
-                                    <Box>
+                                    <Box marginLeft='1rem'>
                                         <Flex gap='1rem' alignItems='center'><Text fontWeight={700}>Reply from owner</Text><Text color='#878790' fontSize='0.8rem'>{e.date}</Text></Flex>
                                         <Text dangerouslySetInnerHTML={{__html: DomPurify.sanitize(e.content.replace('style="display:none"', ''))}}></Text>
                                     </Box>
