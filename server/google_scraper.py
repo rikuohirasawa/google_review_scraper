@@ -50,16 +50,19 @@ def launchChrome(url, db_ref):
 
     # print('link', driver.get(link))
     driver.get(url)
+    print('url received')
     # print(BeautifulSoup(driver.page_source, 'html.parser').prettify())
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-sort-id='newestFirst']")))
     WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "div[data-sort-id='newestFirst']")))
     driver.find_element(By.CSS_SELECTOR, "div[data-sort-id='newestFirst']").click()
+    print('clicked btn')
     sleep(2)
     num_reviews = int(driver.find_element(By.CSS_SELECTOR, "span[class='z5jxId']").text.split()[0])
     num_scroll_to_bottom = math.ceil(num_reviews/10)
     for i in range(0, num_scroll_to_bottom):
         driver.execute_script("document.querySelector('.review-dialog-list').scrollTo(0, document.querySelector('.review-dialog-list').scrollHeight)")
         sleep(2)
+    print('scrolled to bottom')
     sleep(3)
     
     content = driver.page_source
