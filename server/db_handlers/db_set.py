@@ -8,4 +8,11 @@ import firebase_admin
 # })
 
 def db_set(ref, data):
-    db.reference(ref).set(data)
+    try:
+        db.reference(ref).set(data)
+        print(f'db document {ref} updated')
+    except Exception as err:
+        print(type(err))
+        print(err.args)
+        print(err)
+        

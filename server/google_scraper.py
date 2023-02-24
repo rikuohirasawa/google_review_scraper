@@ -147,6 +147,7 @@ def launchChrome(url, db_ref):
     # ref.set(review_list)
     # while(True):
     #     pass
+    db_set(db_ref, review_list)
     return review_list
 
 # launchChrome()
