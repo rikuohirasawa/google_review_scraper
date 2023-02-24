@@ -16,15 +16,17 @@ from dotenv import load_dotenv
 import math
 import json
 from pyvirtualdisplay import Display
+from db_handlers.db_get import db_get
+from db_handlers.db_set import db_set
 
 link = 'https://www.google.com/search?q=King%27s+Bridge+Service+Station%2C+Kings+Bridge+Road%2C+St.+John%27s%2C+Newfoundland+and+Labrador&rlz=1C5GCEM_enCA1032CA1032&sxsrf=AJOqlzWEZtCvuBvQYFsUhYAy_WMWmvIU9g%3A1677160312137&ei=eG_3Y-WCCM6nptQP8KKUyA0&oq=kings+bridge+auto+st+johns+newfoun&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQARgAMgIIJjoHCCMQsAMQJzoKCAAQRxDWBBCwAzoECCMQJzoJCAAQFhAeEPEEOgsIABAWEB4Q8QQQCjoICAAQFhAeEAo6BQgAEIYDOgcIABANEIAEOgYIABAeEA06CwgAEAgQHhANEPEESgQIQRgAULcJWN0eYIYsaAFwAXgAgAGAAYgBmg2SAQQxMy40mAEAoAEByAEEwAEB&sclient=gws-wiz-serp#lrd=0x4b0ca3c1857b5645:0x7a7a0b75909dffd7,1,,,,'
 max = 'https://www.google.com/search?q=max+auto+repairs&rlz=1C5GCEM_enCA1032CA1032&sxsrf=AJOqlzXEQpc-DPoqhQxk58HrP-hncDJ4Ag%3A1676570233806&ei=eW7uY_XRMISZptQPuYO3iAY&ved=0ahUKEwi18ufpzpr9AhWEjIkEHbnBDWEQ4dUDCA8&uact=5&oq=max+auto+repairs&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQAzIFCAAQgAQyCQgAEBYQHhDxBDIJCAAQFhAeEPEEMgYIABAWEB4yBggAEBYQHjIJCAAQFhAeEPEEMgkIABAWEB4Q8QQyCQgAEBYQHhDxBDIGCAAQFhAeMgYIABAWEB46BwgjELADECc6CggAEEcQ1gQQsAM6BAgjECc6CwguEMcBEK8BEJECOgUIABCRAjoLCC4QgAQQxwEQ0QM6CwgAEIAEELEDEIMBOg4ILhCABBCxAxDHARDRAzoFCC4QkQI6BAgAEEM6CggAELEDEIMBEEM6EAguEIAEEBQQhwIQxwEQrwE6CwguEIAEEMcBEK8BOgQILhBDOgcILhCxAxBDOhEILhCABBCxAxCDARDHARCvAToKCC4QsQMQgwEQQzoLCC4QrwEQxwEQgARKBAhBGABQmkhYwVhg9FloCXABeACAAagBiAGqD5IBBDAuMTaYAQCgAQHIAQPAAQE&sclient=gws-wiz-serp#lrd=0x4b0ca7c55c15d4b3:0x80aada1a73c25827,1,,,,'
 
-cred = credentials.Certificate('firebase_credentials.json')
-print(cred)
-default_app = firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://mm-scraper-db-1f403-default-rtdb.firebaseio.com/'
-})
+# cred = credentials.Certificate('firebase_credentials.json')
+# print(cred)
+# default_app = firebase_admin.initialize_app(cred, {
+#     'databaseURL': 'https://mm-scraper-db-1f403-default-rtdb.firebaseio.com/'
+# })
 
 def launchChrome():
     print(os.listdir())
@@ -147,20 +149,20 @@ def launchChrome():
 
 
 
-
+# db_set('/kings_bridge_auto', launchChrome())
 
 # ref = db.reference('/max_auto_repair')
 
-def db_set(ref):
-    db.reference(ref).set(launchChrome())
+# def db_set(ref):
+#     db.reference(ref).set(launchChrome())
 
-# db_set('/kings_bridge_auto')
+db_set('/kings_bridge_auto', launchChrome())
 
-def db_get(ref):
-    print(db.reference(ref).get())
-    return db.reference(ref).get()
+# def db_get(ref):
+#     print(db.reference(ref).get())
+#     return db.reference(ref).get()
 
-print(db_get('/kings_bridge_auto'))
+# print(db_get('/kings_bridge_auto'))
 
 
 # def sample():
