@@ -47,11 +47,8 @@ def launchChrome(url, db_ref):
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     wait = WebDriverWait(driver, 5)
     driver.maximize_window()
-
-    # print('link', driver.get(link))
     driver.get(url)
     print('url received')
-    # print(BeautifulSoup(driver.page_source, 'html.parser').prettify())
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-sort-id='newestFirst']")))
     WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "div[data-sort-id='newestFirst']")))
     driver.find_element(By.CSS_SELECTOR, "div[data-sort-id='newestFirst']").click()
@@ -93,8 +90,6 @@ def launchChrome(url, db_ref):
         services = content_soup.find('div', class_='JRGY0')
         if (services == None):
             services = content_soup.find('div', class_='eX1cmf')
-
-        # response_soup = BeautifulSoup(str(node.find('div', class_='LfKETd')))
         reply_list = []
         # owner responses
         reply_node = node.find('div', class_='LfKETd')
@@ -107,7 +102,6 @@ def launchChrome(url, db_ref):
             if (BeautifulSoup(str(reply_node), 'html.parser').find('div', class_='lororc')):
                 reply_soup = BeautifulSoup(str(reply_node), 'html.parser').find('div', class_='lororc')
                 reply_content_node = reply_soup.find('span', class_='d6SCIc')
-                print('hello', str(reply_content_node))
                 reply['content'] = str(reply_content_node)
             else:
                 reply_content_node = node.find('div', class_='d6SCIc')
@@ -115,19 +109,17 @@ def launchChrome(url, db_ref):
                     reply['content'] = reply_content_node.text
             reply_date_node = node.find('span', class_='pi8uOe')
             reply['date'] = reply_date_node.text
-            # node.find('div', class_='d6SCIc').text
-            print('reply', reply)
             reply_list.append(reply)
         
-        # print(reply_list)
-
         # if review is long enough that it is clipped, get full review node
         full_text = content_soup.find('span', class_='review-full-text')
         if (full_text):
             if (services):
                 content_dict['review'] = full_text.text.replace(services.text, '')
                 content_dict['services'] = services.text
-                # print(content_dict['review'])
+                review_text = str(full_text)
+                review_services = str(services)
+                full_text = review_text.replace(review_services, '')
             else:
                 content_dict['review'] = full_text.text
         # else if services are in review text
@@ -149,7 +141,6 @@ def launchChrome(url, db_ref):
         }
         review_list.append(review_dict)    
     print(len(review_list))
-    # ref.set(review_list)
     # while(True):
     #     pass
     db_set(db_ref, review_list)

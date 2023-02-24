@@ -39,4 +39,11 @@ def launchChrome():
         print(err)
         print('there is no element')
 
-launchChrome()
+# launchChrome()
+
+
+string = r"""<span class="review-full-text" style="display:none">I have never had more trust in a garage and it's staff than in Kings bridge service station.<br/><br/>Honest service with no beating around the bush.<br/>Kind knowledgable helpful crew - but don't waist there time.<br/>It's a St.John's business legacy for god"s sake.<br/>That title has been earned, not claimed.<br/><br/>I wish my truck ( though they tell me its a car)- broke down more often..thats how much time i have for this joint.<br/><br/>Ned Pratt<br/><br/>proud Honda Ridgeline owner.<br/>( it is a truck)<div class="JRGY0"><b class="YQwAz">Services:</b><span class="h5vETc"> <span>Engine repair</span>, <span>Air conditioning</span>, <span>Auto engine diagnostic</span>, <span>Tires</span>, <span>Brakes</span>, <span>Auto brake repair</span></span></div></span>"""
+
+services = r"""<div class="JRGY0"><b class="YQwAz">Services:</b><span class="h5vETc"> <span>Engine repair</span>, <span>Air conditioning</span>, <span>Auto engine diagnostic</span>, <span>Tires</span>, <span>Brakes</span>, <span>Auto brake repair</span></span></div>"""
+print(string.replace(services, ''))
+
