@@ -24,7 +24,7 @@ function App() {
   const [reviews, setReviews] = useState(null);
   const [shop, setShop] = useState('/kings_bridge_auto')
   useEffect(()=>{
-    fetch(`http://127.0.0.1:8000/api/garage-reviews?ref=${shop}`)
+    fetch(`http://reviews.devcanada.online/api/garage-reviews?ref=${shop}`)
     .then(res=>res.json()
     ).then(data=>{
       console.log(data)
