@@ -36,116 +36,119 @@ default_app = firebase_admin.initialize_app(cred, {
 def launchChrome(url, db_ref):
     print(db_ref)
 
-    display = Display(visible=0, size=(1920, 1080))
-    display.start()
-    options = webdriver.ChromeOptions()
-    options.add_argument('--no-sandbox')
-    options.add_argument('--headless')
-    options.add_argument("--window-size=1920,1080")
-    options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' 'Chrome/97.0.4692.71 Safari/537.36')
-
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-    wait = WebDriverWait(driver, 5)
-    driver.maximize_window()
-    driver.get(url)
-    print('url received')
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-sort-id='newestFirst']")))
-    WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "div[data-sort-id='newestFirst']")))
-    driver.find_element(By.CSS_SELECTOR, "div[data-sort-id='newestFirst']").click()
-    print('clicked btn')
-    sleep(2)
-    num_reviews = int(driver.find_element(By.CSS_SELECTOR, "span[class='z5jxId']").text.split()[0])
-    num_scroll_to_bottom = math.ceil(num_reviews/10)
-    for i in range(0, num_scroll_to_bottom):
-        driver.execute_script("document.querySelector('.review-dialog-list').scrollTo(0, document.querySelector('.review-dialog-list').scrollHeight)")
+    try:
+        # display = Display(visible=0, size=(1920, 1080))
+        # display.start()
+        options = webdriver.ChromeOptions()
+        options.add_argument('--no-sandbox')
+        options.add_argument('--headless')
+        options.add_argument("--window-size=1920,1080")
+        options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' 'Chrome/97.0.4692.71 Safari/537.36')
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+        wait = WebDriverWait(driver, 5)
+        driver.maximize_window()
+        driver.get(url)
+        print('url received')
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-sort-id='newestFirst']")))
+        WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "div[data-sort-id='newestFirst']")))
+        driver.find_element(By.CSS_SELECTOR, "div[data-sort-id='newestFirst']").click()
+        print('clicked btn')
         sleep(2)
-    print('scrolled to bottom')
-    sleep(3)
-    
-    content = driver.page_source
-    soup = BeautifulSoup(content, 'html.parser')
-    nodes = soup.find_all("div", class_="gws-localreviews__google-review")
-    review_list = []
-    for node in nodes:
-        node = BeautifulSoup(str(node), 'html.parser')
-        # trim down the nodes, removing unecessary nodes
-        # node.find("g-dropdown-menu").decompose()
-        # removals = node.find_all("g-snackbar")
-        # for rm in removals:
-        #     rm.decompose()
-        # node.find("span", class_="review-snippet").decompose()
-        img_node = node.find("img", class_='lDY1rd')
-        avatar = img_node['src']
-        user_name = img_node['alt']
-        rating = node.find("span", class_=['Fam1ne', 'EBe2gf'])['aria-label']
-        date = node.find('span', class_=['dehysf', 'lTi8oc']).text
+        num_reviews = int(driver.find_element(By.CSS_SELECTOR, "span[class='z5jxId']").text.split()[0])
+        num_scroll_to_bottom = math.ceil(num_reviews/10)
+        for i in range(0, num_scroll_to_bottom):
+            driver.execute_script("document.querySelector('.review-dialog-list').scrollTo(0, document.querySelector('.review-dialog-list').scrollHeight)")
+            sleep(2)
+        print('scrolled to bottom')
+        sleep(3)
         
-        content_dict = {
-            'review': '',
-            'services': ''
-        }
-        content = node.find('div', class_='Jtu6Td')
-        content_soup = BeautifulSoup(str(content), 'html.parser')
-        # services - if customer lists services they received
-        services = content_soup.find('div', class_='JRGY0')
-        if (services == None):
-            services = content_soup.find('div', class_='eX1cmf')
-        reply_list = []
-        # owner responses
-        reply_node = node.find('div', class_='LfKETd')
-        if (reply_node):
-            reply = {
-                'date': '',
-                'content': ''
+        content = driver.page_source
+        soup = BeautifulSoup(content, 'html.parser')
+        nodes = soup.find_all("div", class_="gws-localreviews__google-review")
+        review_list = []
+        for node in nodes:
+            node = BeautifulSoup(str(node), 'html.parser')
+            # trim down the nodes, removing unecessary nodes
+            # node.find("g-dropdown-menu").decompose()
+            # removals = node.find_all("g-snackbar")
+            # for rm in removals:
+            #     rm.decompose()
+            # node.find("span", class_="review-snippet").decompose()
+            img_node = node.find("img", class_='lDY1rd')
+            avatar = img_node['src']
+            user_name = img_node['alt']
+            rating = node.find("span", class_=['Fam1ne', 'EBe2gf'])['aria-label']
+            date = node.find('span', class_=['dehysf', 'lTi8oc']).text
+            
+            content_dict = {
+                'review': '',
+                'services': ''
             }
+            content = node.find('div', class_='Jtu6Td')
+            content_soup = BeautifulSoup(str(content), 'html.parser')
+            # services - if customer lists services they received
+            services = content_soup.find('div', class_='JRGY0')
+            if (services == None):
+                services = content_soup.find('div', class_='eX1cmf')
+            reply_list = []
+            # owner responses
+            reply_node = node.find('div', class_='LfKETd')
+            if (reply_node):
+                reply = {
+                    'date': '',
+                    'content': ''
+                }
 
-            if (BeautifulSoup(str(reply_node), 'html.parser').find('div', class_='lororc')):
-                reply_soup = BeautifulSoup(str(reply_node), 'html.parser').find('div', class_='lororc')
-                reply_content_node = reply_soup.find('span', class_='d6SCIc')
-                reply['content'] = str(reply_content_node)
-            else:
-                reply_content_node = node.find('div', class_='d6SCIc')
-                if reply_content_node:
-                    reply['content'] = reply_content_node.text
-            reply_date_node = node.find('span', class_='pi8uOe')
-            reply['date'] = reply_date_node.text
-            reply_list.append(reply)
-        
-        # if review is long enough that it is clipped, get full review node
-        full_text = content_soup.find('span', class_='review-full-text')
-        if (full_text):
-            if (services):
-                content_dict['review'] = full_text.text.replace(services.text, '')
+                if (BeautifulSoup(str(reply_node), 'html.parser').find('div', class_='lororc')):
+                    reply_soup = BeautifulSoup(str(reply_node), 'html.parser').find('div', class_='lororc')
+                    reply_content_node = reply_soup.find('span', class_='d6SCIc')
+                    reply['content'] = str(reply_content_node)
+                else:
+                    reply_content_node = node.find('div', class_='d6SCIc')
+                    if reply_content_node:
+                        reply['content'] = reply_content_node.text
+                reply_date_node = node.find('span', class_='pi8uOe')
+                reply['date'] = reply_date_node.text
+                reply_list.append(reply)
+            
+            # if review is long enough that it is clipped, get full review node
+            full_text = content_soup.find('span', class_='review-full-text')
+            if (full_text):
+                if (services):
+                    content_dict['review'] = full_text.text.replace(services.text, '')
+                    content_dict['services'] = services.text
+                    review_text = str(full_text)
+                    review_services = str(services)
+                    full_text = review_text.replace(review_services, '')
+                else:
+                    content_dict['review'] = full_text.text
+            # else if services are in review text
+            elif (services):
+                content_dict['review'] = content_soup.text.replace(services.text, '')
                 content_dict['services'] = services.text
-                review_text = str(full_text)
-                review_services = str(services)
-                full_text = review_text.replace(review_services, '')
-            else:
-                content_dict['review'] = full_text.text
-        # else if services are in review text
-        elif (services):
-            content_dict['review'] = content_soup.text.replace(services.text, '')
-            content_dict['services'] = services.text
-        # else get review content as normal
-        else: 
-            content_dict['review'] = content_soup.find('div', class_='Jtu6Td').text
-        # services
-        review_dict = {
-            'avatar': avatar,
-            'name': user_name,
-            'rating': rating,
-            'date': date,
-            'content': content_dict,
-            'full_review': str(full_text),
-            'replies': json.dumps(reply_list)
-        }
-        review_list.append(review_dict)    
-    print(len(review_list))
-    # while(True):
-    #     pass
-    db_set(db_ref, review_list)
-    return review_list
-
+            # else get review content as normal
+            else: 
+                content_dict['review'] = content_soup.find('div', class_='Jtu6Td').text
+            # services
+            review_dict = {
+                'avatar': avatar,
+                'name': user_name,
+                'rating': rating,
+                'date': date,
+                'content': content_dict,
+                'full_review': str(full_text),
+                'replies': json.dumps(reply_list)
+            }
+            review_list.append(review_dict)    
+        print(len(review_list))
+        # while(True):
+        #     pass
+        db_set(db_ref, review_list)
+        return review_list
+    except Exception as err:
+        print(err.args)
+        print(err)
+        print(type(err))
 # launchChrome()
 
 
