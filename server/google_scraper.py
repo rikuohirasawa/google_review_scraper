@@ -8,7 +8,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from time import sleep
 from requests_html import HTMLSession
-import chromedriver_binary
 import firebase_admin
 from firebase_admin import credentials, db
 import os
@@ -18,6 +17,7 @@ import json
 from pyvirtualdisplay import Display
 from db_handlers.db_get import db_get
 from db_handlers.db_set import db_set
+from datetime import datetime
 
 links = [
     # kings bridge auto
@@ -28,13 +28,20 @@ links = [
 link = 'https://www.google.com/search?q=King%27s+Bridge+Service+Station%2C+Kings+Bridge+Road%2C+St.+John%27s%2C+Newfoundland+and+Labrador&rlz=1C5GCEM_enCA1032CA1032&sxsrf=AJOqlzWEZtCvuBvQYFsUhYAy_WMWmvIU9g%3A1677160312137&ei=eG_3Y-WCCM6nptQP8KKUyA0&oq=kings+bridge+auto+st+johns+newfoun&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQARgAMgIIJjoHCCMQsAMQJzoKCAAQRxDWBBCwAzoECCMQJzoJCAAQFhAeEPEEOgsIABAWEB4Q8QQQCjoICAAQFhAeEAo6BQgAEIYDOgcIABANEIAEOgYIABAeEA06CwgAEAgQHhANEPEESgQIQRgAULcJWN0eYIYsaAFwAXgAgAGAAYgBmg2SAQQxMy40mAEAoAEByAEEwAEB&sclient=gws-wiz-serp#lrd=0x4b0ca3c1857b5645:0x7a7a0b75909dffd7,1,,,,'
 max = 'https://www.google.com/search?q=max+auto+repairs&rlz=1C5GCEM_enCA1032CA1032&sxsrf=AJOqlzXEQpc-DPoqhQxk58HrP-hncDJ4Ag%3A1676570233806&ei=eW7uY_XRMISZptQPuYO3iAY&ved=0ahUKEwi18ufpzpr9AhWEjIkEHbnBDWEQ4dUDCA8&uact=5&oq=max+auto+repairs&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQAzIFCAAQgAQyCQgAEBYQHhDxBDIJCAAQFhAeEPEEMgYIABAWEB4yBggAEBYQHjIJCAAQFhAeEPEEMgkIABAWEB4Q8QQyCQgAEBYQHhDxBDIGCAAQFhAeMgYIABAWEB46BwgjELADECc6CggAEEcQ1gQQsAM6BAgjECc6CwguEMcBEK8BEJECOgUIABCRAjoLCC4QgAQQxwEQ0QM6CwgAEIAEELEDEIMBOg4ILhCABBCxAxDHARDRAzoFCC4QkQI6BAgAEEM6CggAELEDEIMBEEM6EAguEIAEEBQQhwIQxwEQrwE6CwguEIAEEMcBEK8BOgQILhBDOgcILhCxAxBDOhEILhCABBCxAxCDARDHARCvAToKCC4QsQMQgwEQQzoLCC4QrwEQxwEQgARKBAhBGABQmkhYwVhg9FloCXABeACAAagBiAGqD5IBBDAuMTaYAQCgAQHIAQPAAQE&sclient=gws-wiz-serp#lrd=0x4b0ca7c55c15d4b3:0x80aada1a73c25827,1,,,,'
 
-cred = credentials.Certificate('firebase_credentials.json')
+cred = credentials.Certificate('/home/ubuntu/google_review_scraper/server/firebase_credentials.json')
 default_app = firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://mm-scraper-db-1f403-default-rtdb.firebaseio.com/'
 })
 
 def launchChrome(url, db_ref):
     print(db_ref)
+
+    def db_set_date(msg):
+        date = datetime.today()
+        date_dict = {
+                f'{date.year}-{date.month}-{date.day}': msg
+            }
+        db.reference('/dates').set(date_dict)
 
     try:
         # display = Display(visible=0, size=(1920, 1080))
@@ -44,7 +51,7 @@ def launchChrome(url, db_ref):
         options.add_argument('--headless')
         options.add_argument("--window-size=1920,1080")
         options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' 'Chrome/97.0.4692.71 Safari/537.36')
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+        driver = webdriver.Chrome(service=Service('/usr/bin/chromedriver'), options=options)
         wait = WebDriverWait(driver, 5)
         driver.maximize_window()
         driver.get(url)
@@ -143,12 +150,15 @@ def launchChrome(url, db_ref):
         print(len(review_list))
         # while(True):
         #     pass
+        db_set_date('success')
         db_set(db_ref, review_list)
         return review_list
     except Exception as err:
         print(err.args)
         print(err)
         print(type(err))
+        db_set_date(f'failure - {type(err)}')
+
 # launchChrome()
 
 
