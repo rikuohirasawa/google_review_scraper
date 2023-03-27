@@ -110,7 +110,6 @@ def launchChrome(url, db_ref):
                 reply_date_node = node.find('span', class_='pi8uOe')
                 reply['date'] = reply_date_node.text
                 reply_list.append(reply)
-            
             # if review is long enough that it is clipped, get full review node
             full_text = content_soup.find('span', class_='review-full-text')
             if (full_text):
@@ -147,17 +146,11 @@ def launchChrome(url, db_ref):
         db_set(db_ref, review_list)
         return review_list
     except Exception as err:
+        print(traceback.format_exc())
         print(err.args)
         print(err)
         print(type(err))
-        db_set_date(f'failure - {type(err)}')
-
-# launchChrome()
-
-
-
-
-# db_set('/kings_bridge_auto', launchChrome())
+        db_update_date({'type': type(err), 'traceback': traceback.format_exc() })
 
 for garage in links:
     url = garage[0]
