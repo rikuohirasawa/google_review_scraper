@@ -1,5 +1,4 @@
-from firebase_admin import credentials, db
-import firebase_admin
+from firebase_admin import db
 
 # cred = credentials.Certificate('firebase_credentials.json')
 
@@ -9,5 +8,3 @@ import firebase_admin
 
 def db_get(ref):
     return db.reference(ref).get()
-
-# print(db_get('/kings_bridge_auto'))
