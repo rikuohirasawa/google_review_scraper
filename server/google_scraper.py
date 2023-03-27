@@ -13,8 +13,9 @@ import json
 from pyvirtualdisplay import Display
 from db_handlers.db_set import db_set
 from db_handlers.db_update_dates import db_update_date
-import traceback
 
+
+import traceback
 
 links = [
     # kings bridge auto
@@ -76,7 +77,7 @@ def launchChrome(url, db_ref):
             img_node = node.find("img", class_='lDY1rd')
             avatar = img_node['src']
             user_name = img_node['alt']
-            rating = node.find("span", class_=['Fam1ne', 'EBe2gf'])['aria-label']
+            rating = node.find("span", class_=['lTi8oc', 'z3HNkc'])['aria-label']
             date = node.find('span', class_=['dehysf', 'lTi8oc']).text
             
             content_dict = {
@@ -146,11 +147,17 @@ def launchChrome(url, db_ref):
         db_set(db_ref, review_list)
         return review_list
     except Exception as err:
-        print(traceback.format_exc())
         print(err.args)
         print(err)
         print(type(err))
-        db_update_date({'type': type(err), 'line': traceback.format_exc()})
+        db_set_date(f'failure - {type(err)}')
+
+# launchChrome()
+
+
+
+
+# db_set('/kings_bridge_auto', launchChrome())
 
 for garage in links:
     url = garage[0]
