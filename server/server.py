@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from google_scraper import launchChrome
+# from google_scraper import launchChrome
 from db_handlers.db_get import db_get
 import firebase_admin
 from firebase_admin import credentials, db
@@ -18,11 +18,11 @@ CORS(app)
 def hello_world():
     return ('hello world')
 
-@app.route('/api/get-reviews', methods=['GET'])
-def get_reviews():
-    response = jsonify(launchChrome())
-    response.headers.set('Access-Control-Allow-Origin', '*')
-    return response
+#@app.route('/api/get-reviews', methods=['GET'])
+#def get_reviews():
+   #response = jsonify(launchChrome())
+   #response.headers.set('Access-Control-Allow-Origin', '*')
+   #return response
 
 
 @app.route('/api/garage-reviews', methods=['GET'])

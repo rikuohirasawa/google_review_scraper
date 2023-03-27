@@ -18,6 +18,7 @@ from pyvirtualdisplay import Display
 from db_handlers.db_get import db_get
 from db_handlers.db_set import db_set
 from datetime import datetime
+import traceback
 
 links = [
     # kings bridge auto
@@ -84,7 +85,7 @@ def launchChrome(url, db_ref):
             img_node = node.find("img", class_='lDY1rd')
             avatar = img_node['src']
             user_name = img_node['alt']
-            rating = node.find("span", class_=['Fam1ne', 'EBe2gf'])['aria-label']
+            rating = node.find("span", class_=['lTi8oc', 'z3HNkc'])['aria-label']
             date = node.find('span', class_=['dehysf', 'lTi8oc']).text
             
             content_dict = {
@@ -154,10 +155,11 @@ def launchChrome(url, db_ref):
         db_set(db_ref, review_list)
         return review_list
     except Exception as err:
+        print(traceback.format_exc())
         print(err.args)
         print(err)
         print(type(err))
-        db_set_date(f'failure - {type(err)}')
+        db_set_date(f'failure - {type(err)}, {traceback.format_exc()}')
 
 # launchChrome()
 
